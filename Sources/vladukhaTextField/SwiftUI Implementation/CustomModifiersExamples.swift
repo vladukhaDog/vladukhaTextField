@@ -1,24 +1,15 @@
-# vladukhaTextField
+// CustomModifiersExamples.swift
+// Demonstrates all available custom modifiers with @State text
+import SwiftUI
 
-A SwiftUI text field with a floating placeholder label, optional secure entry, custom validation, focus binding, and an optional toolbar Done button. Internally, it’s backed by a UIKit `UITextField` for fine‑grained control and reliable first‑responder behavior.
-
-- Platform: iOS 15
-- Language: Swift
-- Package Type: Swift Package
-
-## Features
-
-- Floating placeholder label that animates between centered and compact top‑aligned states
-- Optional secure text entry (password fields)
-- Custom validation via a predicate to accept/reject edits
-- Two‑way focus binding to control and observe first responder
-- Keyboard customization (type, autocapitalization, content type)
-- Optional toolbar Done button above the keyboard
-- Accessibility identifier passthrough to the underlying `UITextField`
-
-## Example
-
-```swift
+struct CustomModifiersExamples: View {
+    @State private var text = ""
+    @State private var textNumbers = ""
+    @State private var isFocused = false
+    @State private var contentType: UITextContentType? = .emailAddress
+    
+    var body: some View {
+        Form {
             Section("doneButton(_:) Example") {
                 VTextField("Donable", text: $text)
                     .doneButton(true)
@@ -53,17 +44,10 @@ A SwiftUI text field with a floating placeholder label, optional secure entry, c
                 VTextField("Secure", text: $text)
                     .secure(true)
             }
-```
+        }
+    }
+}
 
-## Installation
-
-Add the package to your project using Swift Package Manager:
-
-1. In Xcode, choose File > Add Package Dependencies…
-2. Enter the repository URL for this package.
-3. Select the “vladukhaTextField” library product.
-
-Or add it directly in your Package.swift:
-
-```swift
-.package(url: "https://github.com/your/repo/url.git", branch: "main"),
+#Preview {
+    CustomModifiersExamples()
+}

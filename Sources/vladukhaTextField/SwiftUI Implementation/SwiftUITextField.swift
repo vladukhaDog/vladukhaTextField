@@ -9,29 +9,28 @@ public struct VTextField: View {
     /// Two-way binding to the text value.
     @Binding var text: String
     /// Content type hint (auto-fill and semantic meaning).
-    private let textContentType: UITextContentType?
+    @Environment(\.tfContentType) var textContentType: UITextContentType?
     /// Autocapitalization behavior.
-    private let textInputAutocapitalization: UITextAutocapitalizationType
+    @Environment(\.tfAutocapitalization) var textInputAutocapitalization: UITextAutocapitalizationType
     /// Keyboard type to present.
-    private let keyboardType: UIKeyboardType
+    @Environment(\.tfKeyboardType) var keyboardType: UIKeyboardType
     /// Placeholder shown as a floating label.
     private let placeholder: String
     /// Whether the field uses secure text entry (password).
-    private let secure: Bool
+    @Environment(\.tfSecure) var secure: Bool
     /// Predicate used to validate or restrict text as it changes. Return false to block the edit.
-    private let checkText: (String) -> Bool
+    @Environment(\.tfContentValidation) var checkText: (String) -> Bool
     /// Whether to add a toolbar Done button above the keyboard.
-    private let doneButton: Bool
+    @Environment(\.tfDoneButton) var doneButton: Bool
     /// Called when the Return key is pressed.
-    private let onCommit: () -> Void
+    @Environment(\.tfOnCommit) var onCommit: () -> Void
     /// Two-way binding to focus (first responder) state. If not supplied, focus is unmanaged.
-    @Binding private var focused: Bool
-    /// Indicates that focus management is disabled because no binding was provided.
-    private let noFocus: Bool
-    /// Internal cancellable storage (unused currently).
-    private var cancellable = Set<AnyCancellable>()
+    @Environment(\.tfFocus) var focused: Binding<Bool>?
+    
     /// Accessibility identifier assigned to the underlying UITextField.
     private let accessibilityIdentifier: String
+    
+    
 
     /// Creates a VTextField.
     /// - Parameters:
@@ -46,38 +45,26 @@ public struct VTextField: View {
     ///   - secure: Whether to enable secure text entry (default: false).
     ///   - doneButton: Whether to show a toolbar Done button above the keyboard (default: false).
     ///   - onCommit: Called when the Return key is pressed (default: no-op).
-    public init(text: Binding<String>,
-         checkText: @escaping (String) -> Bool = {_ in return true},
-         accessibilityIdentifier: String,
-         focused: Binding<Bool>? = nil,
-         placeholder: String,
-         textContentType: UITextContentType? = nil,
-         textInputAutocapitalization: UITextAutocapitalizationType = .sentences,
-         keyboardType: UIKeyboardType = .default,
-         secure: Bool = false,
-         doneButton: Bool = false,
-         onCommit: @escaping () -> Void = {}
+    public init(_ title: String,
+                text: Binding<String>,
+                accessibilityIdentifier: String = ""
     ) {
         self._text = text
-        self.placeholder = placeholder
-        self.textContentType = textContentType
-        self.textInputAutocapitalization = textInputAutocapitalization
-        self.checkText = checkText
-        self.keyboardType = keyboardType
-        self.secure = secure
-        self.onCommit = onCommit
-        self._focused = focused ?? .constant(false)
-        self.noFocus = focused == nil
+        self.placeholder = title
         self.accessibilityIdentifier = accessibilityIdentifier
-        self.doneButton = doneButton
     }
     
     public var body: some View {
         Group {
             UITextFieldRepresentable(text: $text,
-                                     focused: $focused,
+                                     focused: .init(get: {
+                return focused?.wrappedValue
+            }, set: { newValue in
+                if let newValue {
+                    self.focused?.wrappedValue = newValue
+                }
+            }),
                                      accessibilityIdentifier: accessibilityIdentifier,
-                                     noFocus: noFocus,
                                      checkText: checkText,
                                      placeholder: placeholder,
                                      textContentType: textContentType,
@@ -86,23 +73,21 @@ public struct VTextField: View {
                                      secure: secure,
                                      doneButton: doneButton,
                                      onCommit: onCommit)
-                .frame(height: 45)
+            .frame(height: 45)
         }
         
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Material.regular, lineWidth: 1)
+        .background(
+            Material.thin
         )
-
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        
     }
 }
 
 #Preview {
     VStack {
-        VTextField(text: .constant("Text text text"), accessibilityIdentifier: "", placeholder: "Text Placeholdder")
-        VTextField(text: .constant(""), accessibilityIdentifier: "", placeholder: "placeholder")
-        VTextField(text: .constant("Text text text"), accessibilityIdentifier: "", placeholder: "Text Placeholdder")
-        VTextField(text: .constant(""), accessibilityIdentifier: "", focused:.constant(true), placeholder: "placeholder")
+        VTextField("Title", text: .constant("Text text text"))
+
     }
     .padding()
 }
