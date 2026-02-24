@@ -16,6 +16,12 @@ A SwiftUI text field with a floating placeholder label, optional secure entry, c
 - Optional toolbar Done button above the keyboard
 - Accessibility identifier passthrough to the underlying `UITextField`
 
+## License
+
+This project is source-available but not open source.
+Use is permitted only via Swift Package Manager.
+Modification, copying, or redistribution is prohibited.
+
 ## Example
 
 ```swift
